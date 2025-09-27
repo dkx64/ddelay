@@ -1,0 +1,18 @@
+[package]
+name = "oj"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+atomic_float = "1.1.0"
+fundsp = "0.20.0"
+nih_plug = { git = "https://github.com/robbert-vdh/nih-plug.git", features = ["assert_process_allocs"] }
+vizia_plug = { git = "https://github.com/vizia/vizia-plug.git"}
+
+[lib]
+crate-type = ["cdylib"]
+
+[workspace]
+members = [
+    "xtask",
+]
