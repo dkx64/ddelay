@@ -1,12 +1,14 @@
 [package]
-name = "oj"
+name = "dplug"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
 atomic_float = "1.1.0"
-fundsp = "0.20.0"
+circular-buffer = "1.2.0"
+dasp_ring_buffer = "0.11.0"
 nih_plug = { git = "https://github.com/robbert-vdh/nih-plug.git", features = ["assert_process_allocs"] }
+ringbuf = "0.4.8"
 vizia_plug = { git = "https://github.com/vizia/vizia-plug.git"}
 
 [lib]
