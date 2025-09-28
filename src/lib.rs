@@ -5,24 +5,37 @@ use vizia_plug::{vizia::vg::{luma_color_filter::new, Vector}, ViziaState};
 mod editor;
 use circular_buffer::*;
 
-const DELAY_SAMPLES: usize = 100000;
+const DELAY_SAMPLES: usize = 200000;
 
 pub fn delay(
     istime: bool,
     sample: &mut f32,
     feedback: f32,
-    delay_time: f32,
+    delay_time: i32,
     sample_rate: f32,
     tempo: f64,
     circbuf: &mut CircularBuffer<DELAY_SAMPLES, f32>,
 ) {
+    let delay_time_s = match delay_time {
+        9 => 4.0,
+        8 => 3.0,
+        7 => 2.0,
+        6 => 1.5,
+        5 => 1.0,
+        4 => 0.75,
+        3 => 0.5,
+        2 => 0.25,
+        1 => 0.1,
+        0 => 0.05,
+        _ => 0.0
+    };
     if istime {
-        let delay_samples: usize = (delay_time*sample_rate) as usize;
-        *sample += feedback*(circbuf.get(DELAY_SAMPLES-delay_samples-100).unwrap());
+        let delay_samples: usize = (delay_time_s*sample_rate) as usize;
+        *sample += feedback*(circbuf.get(DELAY_SAMPLES-delay_samples).unwrap());
         circbuf.push_back(*sample);
     }  else {
         let bps: f32 = (120f64/tempo) as f32;
-        let delay_samples: usize = (48000.0*bps) as usize;
+        let delay_samples: usize = (sample_rate*delay_time_s*bps).floor() as usize;
         *sample += (feedback*circbuf.get(DELAY_SAMPLES-delay_samples).unwrap());
         circbuf.push_back(*sample);
     }
@@ -42,7 +55,7 @@ struct AudioPluginParams {
     pub istime: BoolParam,
 
     #[id= "time"]
-    pub time: FloatParam,
+    pub time: IntParam,
 
     #[id="feedback"]
     pub feedback: FloatParam,
@@ -63,10 +76,10 @@ impl Default for AudioPluginParams {
         Self {
             editor_state: editor::default_state(),
             istime:BoolParam::new("Timed", true),
-            time: FloatParam::new(
+            time: IntParam::new(
                 "Delay Time",
-                0.5,
-                FloatRange::Linear { min: 0.2, max: 2.0 }
+                6,
+                IntRange::Linear { min: 2, max: 9 }
             ),
             feedback: FloatParam::new("Feedback", 0.5, FloatRange::Linear { min: 0.0, max: 1.0 })
         }
