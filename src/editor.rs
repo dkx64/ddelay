@@ -39,6 +39,7 @@ pub(crate) fn create(
                 .font_size(30.0)
                 .height(Pixels(50.0))
                 .alignment(Alignment::TopCenter);
+            Knob::new(cx, 0.0, Data::params.map(|params| params.feedback.value()), false);
         });
     })
 }

@@ -1,49 +1,15 @@
 use nih_plug::prelude::*;
-use ringbuf::rb;
 use std::sync::Arc;
-use vizia_plug::{vizia::vg::{luma_color_filter::new, Vector}, ViziaState};
+use vizia_plug::ViziaState;
 mod editor;
+mod delay;
 use circular_buffer::*;
 
-const DELAY_SAMPLES: usize = 200000;
 
-pub fn delay(
-    istime: bool,
-    sample: &mut f32,
-    feedback: f32,
-    delay_time: i32,
-    sample_rate: f32,
-    tempo: f64,
-    circbuf: &mut CircularBuffer<DELAY_SAMPLES, f32>,
-) {
-    let delay_time_s = match delay_time {
-        9 => 4.0,
-        8 => 3.0,
-        7 => 2.0,
-        6 => 1.5,
-        5 => 1.0,
-        4 => 0.75,
-        3 => 0.5,
-        2 => 0.25,
-        1 => 0.1,
-        0 => 0.05,
-        _ => 0.0
-    };
-    if istime {
-        let delay_samples: usize = (delay_time_s*sample_rate) as usize;
-        *sample += feedback*(circbuf.get(DELAY_SAMPLES-delay_samples).unwrap());
-        circbuf.push_back(*sample);
-    }  else {
-        let bps: f32 = (120f64/tempo) as f32;
-        let delay_samples: usize = (sample_rate*delay_time_s*bps).floor() as usize;
-        *sample += (feedback*circbuf.get(DELAY_SAMPLES-delay_samples).unwrap());
-        circbuf.push_back(*sample);
-    }
-}
 
 struct AudioPlugin {
     params: Arc<AudioPluginParams>,
-    circbuf: CircularBuffer<DELAY_SAMPLES, f32>
+    circbuf: CircularBuffer<{delay::DELAY_SAMPLES}, f32>
 }
 
 #[derive(Params)]
@@ -65,7 +31,7 @@ impl Default for AudioPlugin {
     fn default() -> Self {
         Self {
             params: Arc::new(AudioPluginParams::default()),
-            circbuf: CircularBuffer::<DELAY_SAMPLES, f32>::new()
+            circbuf: CircularBuffer::<{delay::DELAY_SAMPLES}, f32>::new()
 
         }
     }
@@ -141,12 +107,14 @@ impl Plugin for AudioPlugin {
             let feedback = self.params.feedback.smoothed.next();
             for channel_samples in buffer.iter_samples() {
                 for sample in channel_samples {
-                    delay(
+                    delay::delay(
                         self.params.istime.value(),
                         sample, self.params.feedback.smoothed.next(),
                         self.params.time.smoothed.next(), context.transport().sample_rate,
                         context.transport().tempo.unwrap(),
-                        &mut self.circbuf);
+                        delay::DELAY_SAMPLES,
+                        &mut self.circbuf,
+                    );
 
                 }
             }
