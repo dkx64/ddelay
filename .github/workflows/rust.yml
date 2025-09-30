@@ -2,47 +2,42 @@ name: Rust
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
   build-linux:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Build
-      run: cargo xtask bundle ddelay --release
-    - uses: actions/upload-artifact@v4
-      with:
-        name: linux-artifacts
-        path: target/bundled
+      - uses: actions/checkout@v4
+      - name: Build
+        run: cargo xtask bundle ddelay --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-artifacts
+          path: target/bundled
   build-windows:
-
     runs-on: windows-latest
-
     steps:
-    - uses: actions/checkout@v4
-    - name: Build
-      run: cargo xtask bundle ddelay --release
-    - uses: actions/upload-artifact@v4
-      with:
-        name: windows-artifacts
-        path: target/bundled
+      - uses: actions/checkout@v4
+      - name: Build
+        run: cargo xtask bundle ddelay --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-artifacts
+          path: target/bundled
   build-macos:
-
     runs-on: macos-latest
-
     steps:
-    - uses: actions/checkout@v4
-    - name: Build
-      run: cargo xtask bundle ddelay --release
-    - uses: actions/upload-artifact@v4
-      with:
-        name: macos-artifacts
-        path: target/bundled
+      - uses: actions/checkout@v4
+      - name: Build
+        run: cargo xtask bundle ddelay --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-artifacts
+          path: target/bundled
