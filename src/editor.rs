@@ -1,6 +1,8 @@
 use atomic_float::AtomicF32;
 use nih_plug::prelude::{util, Editor};
-use vizia_plug::vizia::prelude::*;
+use nih_plug::wrapper::vst3::vst3_sys::vst::kStringStereoBFS;
+use vizia_plug::vizia::{prelude::*, vg};
+use vizia_plug::vizia::vg::paint;
 use vizia_plug::widgets::*;
 use vizia_plug::{create_vizia_editor, ViziaState, ViziaTheming};
 use std::sync::atomic::Ordering;
@@ -19,7 +21,7 @@ struct Data {
 impl Model for Data {}
 
 pub(crate) fn default_state() -> Arc<ViziaState> {
-    ViziaState::new(|| (200,150))
+    ViziaState::new(|| (400,400))
 }
 
 pub(crate) fn create(
@@ -31,15 +33,40 @@ pub(crate) fn create(
             params: params.clone(),
         }
         .build(cx);
+        cx.add_font_mem(include_bytes!("../assets/SwanseaBoldItalic-p3Dv.ttf"));
+        cx.add_font_mem(include_bytes!("../assets/SwanseaBold-D0ox.ttf"));
+        cx.add_stylesheet(include_style!("assets/style.css"))
+            .expect("Failed to load stylesheet");
 
         VStack::new(cx, |cx| {
-            Label::new(cx, "AudioPlugin")
-                .font_family(vec![FamilyOwned::Named(String::from(NOTO_SANS))])
-                .font_weight(FontWeightKeyword::Bold)
+            Label::new(cx, "ddelay")
                 .font_size(30.0)
                 .height(Pixels(50.0))
-                .alignment(Alignment::TopCenter);
-            Knob::new(cx, 0.0, Data::params.map(|params| params.feedback.value()), false);
-        });
+                .font_slant(FontSlant::Italic);
+            HStack::new(cx, |cx| {
+                VStack::new(cx, |cx| {
+                    ParamSlider::new(cx, Data::params, |params| &params.feedback).class("knob");
+                    Label::new(cx, "Feedback");
+                })
+                .class("knob-widget")
+                .alignment(Alignment::Center);
+                VStack::new(cx, |cx| {
+                    ParamSlider::new(cx, Data::params, |params| &params.time)
+                        .class("knob");
+                    Label::new(cx, "Delay Time");
+                })
+                .class("knob-widget")
+                .alignment(Alignment::Center);
+            })
+            .padding_top(Pixels(50.0))
+            .alignment(Alignment::Center);
+            ParamButton::new(cx, Data::params, |params| &params.istime)
+                .class("button-widget");
+        })
+        .font_weight(FontWeightKeyword::SemiBold)
+        .alignment(Alignment::Center)
+        .class("body");
+
+
     })
 }

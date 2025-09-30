@@ -6,11 +6,11 @@ edition = "2024"
 [dependencies]
 atomic_float = "1.1.0"
 circular-buffer = "1.2.0"
-nih_plug = { git = "https://github.com/robbert-vdh/nih-plug.git", features = ["assert_process_allocs"] }
+nih_plug = { git = "https://github.com/robbert-vdh/nih-plug.git", features = ["assert_process_allocs", "standalone"] }
 vizia_plug = { git = "https://github.com/vizia/vizia-plug.git"}
 
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "lib"]
 
 [workspace]
 members = [

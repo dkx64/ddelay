@@ -1,6 +1,6 @@
 use circular_buffer::CircularBuffer;
 
-pub const DELAY_SAMPLES: usize = 200000;
+pub const DELAY_SAMPLES: usize = 250000;
 
 pub fn delay(
     istime: bool,

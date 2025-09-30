@@ -5,9 +5,11 @@ mod editor;
 mod delay;
 use circular_buffer::*;
 
+use crate::delay::DELAY_SAMPLES;
 
 
-struct AudioPlugin {
+
+pub struct AudioPlugin {
     params: Arc<AudioPluginParams>,
     circbuf: CircularBuffer<{delay::DELAY_SAMPLES}, f32>
 }
@@ -47,7 +49,14 @@ impl Default for AudioPluginParams {
                 6,
                 IntRange::Linear { min: 2, max: 9 }
             ),
-            feedback: FloatParam::new("Feedback", 0.5, FloatRange::Linear { min: 0.0, max: 1.0 })
+            feedback: FloatParam::new(
+                "Feedback",
+                0.3,
+                FloatRange::Linear
+                { min: 0.0, max: 1.0 }
+            )
+            .with_unit("%")
+            .with_step_size(0.02)
         }
     }
 }
@@ -107,14 +116,17 @@ impl Plugin for AudioPlugin {
             let feedback = self.params.feedback.smoothed.next();
             for channel_samples in buffer.iter_samples() {
                 for sample in channel_samples {
-                    delay::delay(
-                        self.params.istime.value(),
-                        sample, self.params.feedback.smoothed.next(),
-                        self.params.time.smoothed.next(), context.transport().sample_rate,
-                        context.transport().tempo.unwrap(),
-                        delay::DELAY_SAMPLES,
-                        &mut self.circbuf,
-                    );
+                    if 2.0*((120f64/context.transport().tempo.unwrap()) as f32*context.transport().sample_rate) < DELAY_SAMPLES as f32
+                    {
+                        delay::delay(
+                            self.params.istime.value(),
+                            sample, self.params.feedback.smoothed.next(),
+                            self.params.time.smoothed.next(), context.transport().sample_rate,
+                            context.transport().tempo.unwrap(),
+                            delay::DELAY_SAMPLES,
+                            &mut self.circbuf,
+                        );
+                    }
 
                 }
             }

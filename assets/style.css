@@ -1,0 +1,50 @@
+.body {
+    padding: 20px;
+    padding-bottom: 25%;
+    background-color: #111111;
+    color: #eeeeee;
+    font-family: "Swansea";
+    font-weight: bold;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.knob {
+    width: 50px;
+    height: 50px;
+    corner-radius: 100%;
+    color: transparent;
+    overflow: hidden;
+    border-color: #eeeeee;
+    border-width: 0px;
+}
+
+label {
+    font-weight: Regular;
+}
+
+.knob .fill {
+    background-color: #eeeeee;
+}
+
+.button-widget:checked {
+    background-color: transparent;
+    border-color: #eeeeee;
+    border-width: 1px;
+    color: #eeeeee;
+}
+
+param-button {
+    color: #eeeeee;
+}
+
+.knob-widget {
+    gap: 15px;
+}
+
+.texture {
+    position: absolute;
+    top: 0;
+    left: 0;
+}

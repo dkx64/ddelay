@@ -15,5 +15,7 @@ pkgs.mkShell {
     wayland
     freetype
     fontconfig
+    alsa-lib
+    jack2
   ];
 }
